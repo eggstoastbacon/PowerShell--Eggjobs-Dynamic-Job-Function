@@ -17,8 +17,6 @@
 #Exp_Record; createEggJob -jobs 15 -exp_records 'get-content c:\temp\list.txt' -command '$myjobvar | out-file c:\temp\results_$x.txt -append'
 #
 
-
-
 function createEggJob{
 param ([int]$jobs, $int_records, $exp_records, $command)
 
@@ -76,4 +74,3 @@ if(($records.count / $y.count) -like "*.*"){$items = $items + 1}
 
     }
 
-   
