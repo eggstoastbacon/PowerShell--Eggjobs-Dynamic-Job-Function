@@ -28,7 +28,6 @@ function checkJobState {
 }
 
 #Your content
-$path = "filepath"
 if ($int_records){
 $records = $int_records
 }
