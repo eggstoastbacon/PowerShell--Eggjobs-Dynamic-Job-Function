@@ -3,6 +3,9 @@
 #Specify the amount of jobs, the records to use, and the command to perform on the record.
 #Automatically balances items based on the amount of jobs
 #Cleans up jobs when it's done
+# $x is the variable for each specific job.
+# $myjobvar needs to be used in your command as a placeholder for an item in your record array.
+#
 #Params: 
 #Jobs (how many jobs to create), 
 #int_records (numeric value), 
