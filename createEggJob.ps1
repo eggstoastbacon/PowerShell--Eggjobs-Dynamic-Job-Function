@@ -11,6 +11,8 @@
 #int_records (numeric value), 
 #exp_records (invoke a command to retrieve your records), 
 #command (command to use on your records)
+#Command is more than one line? Create a variable with your command as a string in parenthesis. 
+#
 #Usage Examples: 
 #Int_Record; createEggJob -jobs 6 -int_records (1..450) -command '$myjobvar | out-file c:\temp\results_$x.txt -append'
 #
