@@ -52,7 +52,7 @@ function createEggJob {
     }
     remove-Job *
      
-    clear-variable xrecord -ErrorAction SilentlyContinue
+    clear-variable myjobvar -ErrorAction SilentlyContinue
     clear-variable command -ErrorAction SilentlyContinue
     clear-variable exp_records -ErrorAction SilentlyContinue
     clear-variable int_records -ErrorAction SilentlyContinue
