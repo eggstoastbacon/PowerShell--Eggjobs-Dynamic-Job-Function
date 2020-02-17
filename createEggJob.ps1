@@ -1,6 +1,6 @@
 function createEggJob {
     param ([int]$jobs, $int_records, $exp_records, $command, $cache_dir, $replace, $path)
-
+    $stopwatch =  [system.diagnostics.stopwatch]::StartNew()
     function checkJobState {
         $jobStatus = get-job * | Select-Object State | foreach ( { $_.State })
         if ("Running" -in $JobStatus) { $Global:Status = "Running" }else { $Global:Status = "Done" }
@@ -63,11 +63,12 @@ function createEggJob {
         checkJobState
     }
     remove-Job *
+    $stopwatch.Stop()
      
     clear-variable myjobvar -ErrorAction SilentlyContinue
     clear-variable command -ErrorAction SilentlyContinue
     clear-variable exp_records -ErrorAction SilentlyContinue
     clear-variable int_records -ErrorAction SilentlyContinue
     
-    write-host "All jobs are done." -ForegroundColor Cyan
+    write-host ("All jobs are done. Time elapsed: " + $stopwatch.elapsed) -ForegroundColor Cyan
 }
