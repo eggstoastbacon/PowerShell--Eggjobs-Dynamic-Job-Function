@@ -1,79 +1,61 @@
-#EGGSTOASTBACON :: https://github.com/eggstoastbacon
-#Process jobs concurrently by invoking this function. 
-#Specify the amount of jobs, the records to use, and the command to perform on the record.
-#Automatically balances items based on the amount of jobs
-#Cleans up jobs when it's done
-# $x is the variable for each specific job.
-# $myjobvar needs to be used in your command as a placeholder for an item in your record array.
-#
-#Params: 
-#Jobs (how many jobs to create), 
-#int_records (numeric value), 
-#exp_records (invoke a command to retrieve your records), 
-#command (command to use on your records)
-#Command is more than one line? Create a variable with your command as a string in single quotes. 
-#
-#Usage Examples: 
-#Int_Record; createEggJob -jobs 6 -int_records (1..450) -command '$myjobvar | out-file c:\temp\results_$x.txt -append'
-#
-#Exp_Record; createEggJob -jobs 15 -exp_records 'get-content c:\temp\list.txt' -command '$myjobvar | out-file c:\temp\results_$x.txt -append'
-#cache_dir; Specify a cache directory for store and retrieving data. This is useful for throwing data back into variables for further processing. See Readme.
-#
-#
-function createEggJob{
-param ([int]$jobs, $int_records, $exp_records, $command, $cache_dir)
+function createEggJob {
+    param ([int]$jobs, $int_records, $exp_records, $command, $cache_dir, $replace)
 
-function checkJobState {
-    $jobStatus = get-job * | Select-Object State | foreach ( { $_.State })
-    if ("Running" -in $JobStatus) { $Global:Status = "Running" }else { $Global:Status = "Done" }
-}
+    function checkJobState {
+        $jobStatus = get-job * | Select-Object State | foreach ( { $_.State })
+        if ("Running" -in $JobStatus) { $Global:Status = "Running" }else { $Global:Status = "Done" }
+    }
 
-#Your content
-if ($int_records){
-$records = $int_records
-}
-if ($exp_records){
-$records = Invoke-Expression $exp_records
-}
+    #Your content
+    if ($int_records) {
+        $records = $int_records
+    }
+    if ($exp_records) {
+        $records = Invoke-Expression $exp_records
+    }
+    $cache_dir = $cache_dir
+    if ($replace) {
+        $command = $command.replace("$replace", "myjobvar")
+    }
+    #
+    #Number of seperate jobs to spawn
+    $jobs = $jobs
 
-$command = $command.replace("myjobvar","xrecord")
-
-#Number of seperate jobs to spawn
-$jobs = $jobs
-
-$y = 0..($jobs - 1)
-#divide the jobs up equally
-$items = [math]::Round($records.count / $y.count)
-if(($records.count / $y.count) -like "*.*"){$items = $items + 1}
+    $y = 0..($jobs - 1)
+    #divide the jobs up equally
+    $items = [math]::Round($records.count / $y.count)
+    if (($records.count / $y.count) -like "*.*") { $items = $items + 1 }
 
     foreach ($x in $y) {
         start-job -Name ([string]$x + "_eggjob") -ScriptBlock {
-                param ([string]$x,[int]$items,$records,$command) 
+        
+            param ([string]$x, [int]$items, $records, $command, $cachedir) 
                                 
-                if($x -eq 0){$a = 0} else {$a = (([int]$items * $x) + 1)}               
-                $b = (([int]$items * $x) + [int]$items)
+            if ($x -eq 0) { $a = 0 } else { $a = (([int]$items * $x) + 1) }               
+            $b = (([int]$items * $x) + [int]$items)
                               
-                #Distribute the workload
-                $xrecords = $records[[int]$a..[int]$b] 
+            #Distribute the workload
+            $xrecords = $records[[int]$a..[int]$b] 
 
-                #Each job now has a portion of the work to run.
-                foreach ($xrecord in $xrecords) {
+            #Each job now has a portion of the work to run.
+            foreach ($myjobvar in $xrecords) {
                 Invoke-Expression $command
-                }  
-            } -ArgumentList ($x,$items,$records,$command,$cache_dir)
+                
+            }  
+        } -ArgumentList ($x, $items, $records, $command, $cachedir)
     }
 
     checkJobState
-    while($Global:Status -notlike "Done"){
-    start-sleep 3
-    checkJobState
+    while ($Global:Status -notlike "Done") {
+        start-sleep 3
+        checkJobState
     }
-    remove-job *
+    remove-Job *
+     
     clear-variable xrecord -ErrorAction SilentlyContinue
     clear-variable command -ErrorAction SilentlyContinue
     clear-variable exp_records -ErrorAction SilentlyContinue
     clear-variable int_records -ErrorAction SilentlyContinue
+    
     write-host "All jobs are done." -ForegroundColor Cyan
-
-    }
-
+}
