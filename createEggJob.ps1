@@ -42,7 +42,7 @@ function createEggJob {
                 Invoke-Expression $command
                 
             }  
-        } -ArgumentList ($x, $items, $records, $command, $cachedir)
+        } -ArgumentList ($x, $items, $records, $command, $cache_dir)
     }
 
     checkJobState
