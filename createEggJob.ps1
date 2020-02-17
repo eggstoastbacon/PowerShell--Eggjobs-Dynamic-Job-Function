@@ -1,5 +1,5 @@
 function createEggJob {
-    param ([int]$jobs, $int_records, $exp_records, $command, $cache_dir, $replace, $path)
+    param ([int]$jobs, $int_records, $exp_records, $command, $cache_dir, $replace, $path, $errorlog)
     $stopwatch =  [system.diagnostics.stopwatch]::StartNew()
     function checkJobState {
         $jobStatus = get-job * | Select-Object State | foreach ( { $_.State })
@@ -41,10 +41,11 @@ function createEggJob {
     $commandEgg = $command
     $recordsEgg = $records
     $cache_dirEgg = $cache_dir
+    $errorlogEgg = $errorlog
     foreach ($x in $y) {
         start-job -Name ([string]$x + "_eggjob") -ScriptBlock {
         
-            param ([string]$x, [int]$itemsEgg, $recordsEgg, $commandEgg, $cache_dirEgg) 
+            param ([string]$x, [int]$itemsEgg, $recordsEgg, $commandEgg, $cache_dirEgg, $errorlogEgg) 
                                 
             if ($x -eq 0) { $aEgg = 0 } else { $aEgg = (([int]$itemsEgg * $x) + 1) }               
             $bEgg = (([int]$itemsEgg * $x) + [int]$itemsEgg)
@@ -54,8 +55,9 @@ function createEggJob {
 
             #Each job now has a portion of the work to run.
             foreach ($myjobvar in $xrecordsEgg) {
+            try{
                 Invoke-Expression $command
-                
+            }catch{$_.Exception.Message | outfile $errorlogEgg -append}     
             }  
         } -ArgumentList ($x, $itemsEgg, $recordsEgg, $commandEgg, $cache_dirEgg)
     }
