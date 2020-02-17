@@ -29,7 +29,7 @@ function createEggJob {
     foreach ($x in $y) {
         start-job -Name ([string]$x + "_eggjob") -ScriptBlock {
         
-            param ([string]$x, [int]$items, $records, $command, $cachedir) 
+            param ([string]$x, [int]$items, $records, $command, $cache_dir) 
                                 
             if ($x -eq 0) { $a = 0 } else { $a = (([int]$items * $x) + 1) }               
             $b = (([int]$items * $x) + [int]$items)
