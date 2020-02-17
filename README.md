@@ -10,7 +10,7 @@ Cleans up jobs when it's done
 
 // $myjobvar needs to be used in your command as a placeholder for an item in your record array.
 
-Command is more than one line? Create a variable with your command as a string in parenthesis and pass the variable to command, just make sure to include $myjobvar where necessary. 
+Command is more than one line? Create a variable with your command as a string in single quotes and pass the variable to command, just make sure to include $myjobvar where necessary. 
 
 example:
 
