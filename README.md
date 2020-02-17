@@ -15,10 +15,15 @@
 example:
 
 $mycustomcommand = '
+
 $myjobvar | $line1
+
 $myjobvar | $line2
+
 $myjobvar | $line3
+
 '
+
 createEggJob -jobs 4 -exp_records 'get-content c:\temp\list.txt' -command $mycustomcommand
 
 #Params: 
