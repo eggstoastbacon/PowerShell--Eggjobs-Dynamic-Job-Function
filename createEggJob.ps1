@@ -1,5 +1,5 @@
 function createEggJob {
-    param ([int]$jobs, $int_records, $exp_records, $command, $cache_dir, $replace)
+    param ([int]$jobs, $int_records, $exp_records, $command, $cache_dir, $replace, $path)
 
     function checkJobState {
         $jobStatus = get-job * | Select-Object State | foreach ( { $_.State })
@@ -14,18 +14,21 @@ function createEggJob {
         $records = Invoke-Expression $exp_records
     }
     $cache_dir = $cache_dir
-   if ($replace) {
-    #Can you figure out why I had to do this with replace? 
-    $arraycheck = ($replace + "s")
-    if ($command -like "*$arraycheck*") {
-        $command = $command -replace "$arraycheck", "xyzzy"
-        $command = $command -replace "$replace", "myjobvar"
-        $command = $command -replace "xyzzy", "$arraycheck"
+    if ($replace) {
+        #Can you figure out why I had to do this with replace? 
+        $arraycheck = ($replace + "s")
+        if ($command -like "*$arraycheck*") {
+            $command = $command -replace "$arraycheck", "xyzzy"
+            $command = $command -replace "$replace", "myjobvar"
+            $command = $command -replace "xyzzy", "$arraycheck"
+        }
+        else {
+            $command = $command -replace "$replace", "myjobvar"
+        }
     }
-    else {
-        $command = $command -replace "$replace", "myjobvar"
+    if ($path) {
+        $command = $command -replace "\`$path", "$path"
     }
-}
     #
     #Number of seperate jobs to spawn
     $jobs = $jobs
