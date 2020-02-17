@@ -56,7 +56,7 @@ function createEggJob {
             #Each job now has a portion of the work to run.
             foreach ($myjobvar in $xrecordsEgg) {
             try{
-                Invoke-Expression $command
+                Invoke-Expression $commandEgg
             }catch{$_.Exception.Message | outfile ($errorlogEgg + "\errorEggJob_" + $x + ".txt") -append}     
             }  
         } -ArgumentList ($x, $itemsEgg, $recordsEgg, $commandEgg, $cache_dirEgg)
