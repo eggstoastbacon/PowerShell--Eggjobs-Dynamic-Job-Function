@@ -10,7 +10,16 @@
 
 #// $myjobvar needs to be used in your command as a placeholder for an item in your record array.
 
-#Command is more than one line? Create a variable with your command as a string in parenthesis and pass the variable to command, just make sure to include $myjobvar where necessary.
+#Command is more than one line? Create a variable with your command as a string in parenthesis and pass the variable to command, just make sure to include $myjobvar where necessary. 
+
+example:
+
+$mycustomcommand = '
+$myjobvar | $line1
+$myjobvar | $line2
+$myjobvar | $line3
+'
+createEggJob -jobs 4 -exp_records 'get-content c:\temp\list.txt' -command $mycustomcommand
 
 #Params: 
 
