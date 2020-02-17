@@ -6,6 +6,11 @@
 
 #Cleans up jobs when it's done
 
+# // $x is the variable for each specific job.
+# // $myjobvar needs to be used in your command as a placeholder for an item in your record array.
+
+#Command is more than one line? Create a variable with your command as a string in parenthesis and pass the variable to command, just make sure to include $myjobvar where necessary.
+
 #Params: 
 
 #Jobs (how many jobs to create), 
