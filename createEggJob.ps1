@@ -1,9 +1,14 @@
 function createEggJob {
     param ([int]$jobs, $int_records, $exp_records, $command, $cache_dir, $replace, $path, $errorlog)
     $stopwatch =  [system.diagnostics.stopwatch]::StartNew()
+
     function checkJobState {
         $jobStatus = get-job * | Select-Object State | foreach ( { $_.State })
         if ("Running" -in $JobStatus) { $Global:Status = "Running" }else { $Global:Status = "Done" }
+    }
+    function Get-RoundedDown($d, $digits) {
+        $scale = [Math]::Pow(10, $digits)
+        [Math]::Truncate($d * $scale) / $scale
     }
 
     #Your content
@@ -35,7 +40,7 @@ function createEggJob {
 
     $y = 0..($jobs - 1)
     #divide the jobs up equally
-    $items = [math]::Round($records.count / $y.count)
+    $items = Get-RoundedDown ($records.count / $y.count)
     if (($records.count / $y.count) -like "*.*") { $items = $items + 1 }
     $itemsEgg = $items
     $commandEgg = $command
