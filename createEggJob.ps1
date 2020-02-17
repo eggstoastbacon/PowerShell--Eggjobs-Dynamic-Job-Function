@@ -14,9 +14,18 @@ function createEggJob {
         $records = Invoke-Expression $exp_records
     }
     $cache_dir = $cache_dir
-    if ($replace) {
-        $command = $command.replace("$replace", "myjobvar")
+   if ($replace) {
+    #Can you figure out why I had to do this with replace? 
+    $arraycheck = ($replace + "s")
+    if ($command -like "*$arraycheck*") {
+        $command = $command -replace "$arraycheck", "xyzzy"
+        $command = $command -replace "$replace", "myjobvar"
+        $command = $command -replace "xyzzy", "$arraycheck"
     }
+    else {
+        $command = $command -replace "$replace", "myjobvar"
+    }
+}
     #
     #Number of seperate jobs to spawn
     $jobs = $jobs
