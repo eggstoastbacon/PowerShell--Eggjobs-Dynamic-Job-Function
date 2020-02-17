@@ -37,24 +37,27 @@ function createEggJob {
     #divide the jobs up equally
     $items = [math]::Round($records.count / $y.count)
     if (($records.count / $y.count) -like "*.*") { $items = $items + 1 }
-
+    $itemsEgg = $items
+    $commandEgg = $command
+    $recordsEgg = $records
+    $cache_dirEgg = $cache_dir
     foreach ($x in $y) {
         start-job -Name ([string]$x + "_eggjob") -ScriptBlock {
         
-            param ([string]$x, [int]$items, $records, $command, $cache_dir) 
+            param ([string]$x, [int]$itemsEgg, $recordsEgg, $commandEgg, $cache_dirEgg) 
                                 
-            if ($x -eq 0) { $a = 0 } else { $a = (([int]$items * $x) + 1) }               
-            $b = (([int]$items * $x) + [int]$items)
+            if ($x -eq 0) { $aEgg = 0 } else { $aEgg = (([int]$itemsEgg * $x) + 1) }               
+            $bEgg = (([int]$itemsEgg * $x) + [int]$itemsEgg)
                               
             #Distribute the workload
-            $xrecords = $records[[int]$a..[int]$b] 
+            $xrecordsEgg = $recordsEgg[[int]$aEgg..[int]$bEgg] 
 
             #Each job now has a portion of the work to run.
-            foreach ($myjobvar in $xrecords) {
+            foreach ($myjobvar in $xrecordsEgg) {
                 Invoke-Expression $command
                 
             }  
-        } -ArgumentList ($x, $items, $records, $command, $cache_dir)
+        } -ArgumentList ($x, $itemsEgg, $recordsEgg, $commandEgg, $cache_dirEgg)
     }
 
     checkJobState
