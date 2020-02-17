@@ -17,10 +17,11 @@
 #Int_Record; createEggJob -jobs 6 -int_records (1..450) -command '$myjobvar | out-file c:\temp\results_$x.txt -append'
 #
 #Exp_Record; createEggJob -jobs 15 -exp_records 'get-content c:\temp\list.txt' -command '$myjobvar | out-file c:\temp\results_$x.txt -append'
+#cache_dir; Specify a cache directory for store and retrieving data. This is useful for throwing data back into variables for further processing.
 #
-
+#
 function createEggJob{
-param ([int]$jobs, $int_records, $exp_records, $command)
+param ([int]$jobs, $int_records, $exp_records, $command, $cache_dir)
 
 function checkJobState {
     $jobStatus = get-job * | Select-Object State | foreach ( { $_.State })
@@ -59,7 +60,7 @@ if(($records.count / $y.count) -like "*.*"){$items = $items + 1}
                 foreach ($xrecord in $xrecords) {
                 Invoke-Expression $command
                 }  
-            } -ArgumentList ($x,$items,$records,$command)
+            } -ArgumentList ($x,$items,$records,$command,$cache_dir)
     }
 
     checkJobState
