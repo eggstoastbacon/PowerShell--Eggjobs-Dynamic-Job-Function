@@ -42,3 +42,14 @@ Int_Record; createEggJob -jobs 6 -int_records (1..450) -command '$myjobvar | out
 
 Exp_Record; createEggJob -jobs 15 -exp_records 'get-content c:\temp\list.txt' -command '$myjobvar | out-file c:\temp\results_$x.txt -append'
 
+cache_dir; specify a directory to save processed data. Useful for bringing back in a variable for further processing.
+
+Example:
+
+createEggJob -jobs 5 -exp_records 'get-content c:\temp\list.txt' -command $mycommand -cachedir "c:\temp"
+$mycommand = '
+$myjobvar | out-file $cachedir\results_$x.txt -append
+'
+$cachdir = "c:\temp" 
+$results = Get-ChildItem $cachdir | where-object {$_.name -like "*results_*"} | foreach{get-content -path ("$cachdir\" + $_.Name)}
+
