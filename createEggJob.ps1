@@ -57,9 +57,10 @@ function createEggJob {
             foreach ($myjobvar in $xrecordsEgg) {
             try{
                 Invoke-Expression $commandEgg
-            }catch{$_.Exception.Message | outfile ($errorlogEgg + "\errorEggJob_" + $x + ".txt") -append}     
+                $commandEgg | out-file c:\temp\command.txt
+            }catch{$_.Exception.Message | out-file ($errorlogEgg + "\errorEggJob_" + $x + ".txt") -append}     
             }  
-        } -ArgumentList ($x, $itemsEgg, $recordsEgg, $commandEgg, $cache_dirEgg)
+        } -ArgumentList ($x, $itemsEgg, $recordsEgg, $commandEgg, $cache_dirEgg, $errorlogEgg)
     }
 
     checkJobState
@@ -70,8 +71,6 @@ function createEggJob {
     remove-Job *
     $stopwatch.Stop()
      
-    clear-variable myjobvar -ErrorAction SilentlyContinue
-    clear-variable command -ErrorAction SilentlyContinue
     clear-variable exp_records -ErrorAction SilentlyContinue
     clear-variable int_records -ErrorAction SilentlyContinue
     
