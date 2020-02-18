@@ -47,6 +47,10 @@ function createEggJob {
     $recordsEgg = $records
     $cache_dirEgg = $cache_dir
     $errorlogEgg = $errorlog
+    $reccount = $records.count
+
+    write-host ([string]$reccount + " items found, each of the " + $jobs + " jobs will run around " + $items + " items each.") -foregroundcolor cyan
+   
     foreach ($x in $y) {
         start-job -Name ([string]$x + "_eggjob") -ScriptBlock {
         
