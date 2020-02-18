@@ -57,11 +57,11 @@ function createEggJob {
                               
             #Distribute the workload
             $xrecordsEgg = $recordsEgg[[int]$aEgg..[int]$bEgg] 
-
+            $scriptblockEgg = [Scriptblock]::Create($scriptblockEgg)
             #Each job now has a portion of the work to run.
             foreach ($myjobvar in $xrecordsEgg) {
             try{
-            Invoke-Expression $scriptblockEgg
+            Invoke-Command $scriptblockEgg
             }catch{$_.Exception.Message | out-file ($errorlogEgg + "\errorEggJob_" + $x + ".txt") -append}     
             }  
         } -ArgumentList ($x, $itemsEgg, $recordsEgg, $scriptblockEgg, $cache_dirEgg, $errorlogEgg)
