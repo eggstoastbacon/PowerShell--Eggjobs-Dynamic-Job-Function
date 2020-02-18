@@ -18,7 +18,7 @@ function createEggJob {
     if ($exp_records) {
         $records = Invoke-Expression $exp_records
     }
-    $cache_dir = $cache_dir
+
     if ($replace) {
         #Can you figure out why I had to do this with replace? 
         $arraycheck = ($replace + "s")
@@ -34,6 +34,30 @@ function createEggJob {
     if ($path) {
         $scriptblock = $scriptblock -replace "\`$path", "$path"
     }
+    
+    if($skipnth){
+    $vars = (1..$skipnth)
+    foreach ($var in $vars)
+    {New-Variable -Name ("job_" + $var + "_array") -Value @()}
+
+    $jobvarnames = get-variable | where-object {$_.Name -like "*_array*"}
+
+    while ($records.count -gt 0){
+    foreach($jobvar in $jobvarnames){
+    $jobvar
+    $records[0]
+    $sVarString = ("$" + $jobvar.name + " += `$records[0]") | out-string
+    Invoke-Expression $sVarString
+    $records = $records | select-object -skip 1
+    }
+    }
+
+    foreach($jobvar in $jobvarnames){
+    $sVarstring = ("`$records += $" + $jobvar.name) | out-string
+    Invoke-Expression $sVarString
+    }
+    }
+   
     #
     #Number of seperate jobs to spawn
     $jobs = $jobs
