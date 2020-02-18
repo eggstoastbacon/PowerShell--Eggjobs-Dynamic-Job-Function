@@ -44,8 +44,6 @@ function createEggJob {
 
     while ($records.count -gt 0){
     foreach($jobvar in $jobvarnames){
-    $jobvar
-    $records[0]
     $sVarString = ("$" + $jobvar.name + " += `$records[0]") | out-string
     Invoke-Expression $sVarString
     $records = $records | select-object -skip 1
