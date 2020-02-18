@@ -40,7 +40,7 @@ function createEggJob {
     foreach ($var in $vars)
     {New-Variable -Name ("job_" + $var + "_array") -Value @()}
 
-    $jobvarnames = get-variable | where-object {$_.Name -like "*_array*"}
+    $jobvarnames = get-variable | where-object {$_.Name -like "*_array*" -and $_.Name -like "*Job*"}
 
     while ($records.count -gt 0){
     foreach($jobvar in $jobvarnames){
