@@ -1,5 +1,5 @@
 function createEggJob {
-    param ([int]$jobs, $int_records, $exp_records, $command, $cache_dir, $replace, $path, $errorlog)
+    param ([int]$jobs, $int_records, $exp_records, $scriptblock, $cache_dir, $replace, $path, $errorlog)
     $stopwatch =  [system.diagnostics.stopwatch]::StartNew()
 
     function checkJobState {
@@ -22,17 +22,17 @@ function createEggJob {
     if ($replace) {
         #Can you figure out why I had to do this with replace? 
         $arraycheck = ($replace + "s")
-        if ($command -like "*$arraycheck*") {
-            $command = $command -replace "$arraycheck", "xyzzy"
-            $command = $command -replace "$replace", "myjobvar"
-            $command = $command -replace "xyzzy", "$arraycheck"
+        if ($scriptblock -like "*$arraycheck*") {
+            $scriptblock = $scriptblock -replace "$arraycheck", "xyzzy"
+            $scriptblock = $scriptblock -replace "$replace", "myjobvar"
+            $scriptblock = $scriptblock -replace "xyzzy", "$arraycheck"
         }
         else {
-            $command = $command -replace "$replace", "myjobvar"
+            $scriptblock = $scriptblock -replace "$replace", "myjobvar"
         }
     }
     if ($path) {
-        $command = $command -replace "\`$path", "$path"
+        $scriptblock = $scriptblock -replace "\`$path", "$path"
     }
     #
     #Number of seperate jobs to spawn
@@ -43,14 +43,14 @@ function createEggJob {
     $items = Get-RoundedDown ($records.count / $y.count)
     if (($records.count / $y.count) -like "*.*") { $items = $items + 1 }
     $itemsEgg = $items
-    $commandEgg = $command
+    $scriptblockEgg = $scriptblock
     $recordsEgg = $records
     $cache_dirEgg = $cache_dir
     $errorlogEgg = $errorlog
     foreach ($x in $y) {
         start-job -Name ([string]$x + "_eggjob") -ScriptBlock {
         
-            param ([string]$x, [int]$itemsEgg, $recordsEgg, $commandEgg, $cache_dirEgg, $errorlogEgg) 
+            param ([string]$x, [int]$itemsEgg, $recordsEgg, $scriptblockEgg, $cache_dirEgg, $errorlogEgg) 
                                 
             if ($x -eq 0) { $aEgg = 0 } else { $aEgg = (([int]$itemsEgg * $x) + 1) }               
             $bEgg = (([int]$itemsEgg * $x) + [int]$itemsEgg)
@@ -61,10 +61,10 @@ function createEggJob {
             #Each job now has a portion of the work to run.
             foreach ($myjobvar in $xrecordsEgg) {
             try{
-                Invoke-Expression $commandEgg
+            Invoke-Expression $scriptblockEgg
             }catch{$_.Exception.Message | out-file ($errorlogEgg + "\errorEggJob_" + $x + ".txt") -append}     
             }  
-        } -ArgumentList ($x, $itemsEgg, $recordsEgg, $commandEgg, $cache_dirEgg, $errorlogEgg)
+        } -ArgumentList ($x, $itemsEgg, $recordsEgg, $scriptblockEgg, $cache_dirEgg, $errorlogEgg)
     }
 
     checkJobState
