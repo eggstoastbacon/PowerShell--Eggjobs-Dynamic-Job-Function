@@ -1,5 +1,5 @@
 function createEggJob {
-    param ([int]$jobs, $int_records, $exp_records, $scriptblock, $cache_dir, $replace, $path, $errorlog)
+    param ([int]$jobs, $int_records, $exp_records, $scriptblock, $cache_dir, $replace, $path, $errorlog, [int]$skipnth)
     $stopwatch =  [system.diagnostics.stopwatch]::StartNew()
 
     function checkJobState {
@@ -19,22 +19,6 @@ function createEggJob {
         $records = Invoke-Expression $exp_records
     }
 
-    if ($replace) {
-        #Can you figure out why I had to do this with replace? 
-        $arraycheck = ($replace + "s")
-        if ($scriptblock -like "*$arraycheck*") {
-            $scriptblock = $scriptblock -replace "$arraycheck", "xyzzy"
-            $scriptblock = $scriptblock -replace "$replace", "myjobvar"
-            $scriptblock = $scriptblock -replace "xyzzy", "$arraycheck"
-        }
-        else {
-            $scriptblock = $scriptblock -replace "$replace", "myjobvar"
-        }
-    }
-    if ($path) {
-        $scriptblock = $scriptblock -replace "\`$path", "$path"
-    }
-    
     if($skipnth){
     $vars = (1..$skipnth)
     foreach ($var in $vars)
@@ -55,7 +39,25 @@ function createEggJob {
     Invoke-Expression $sVarString
     }
     }
-   
+
+    
+    if ($replace) {
+        #Can you figure out why I had to do this with replace? 
+        $arraycheck = ($replace + "s")
+        if ($scriptblock -like "*$arraycheck*") {
+            $scriptblock = $scriptblock -replace "$arraycheck", "xyzzy"
+            $scriptblock = $scriptblock -replace "$replace", "myjobvar"
+            $scriptblock = $scriptblock -replace "xyzzy", "$arraycheck"
+        }
+        else {
+            $scriptblock = $scriptblock -replace "$replace", "myjobvar"
+        }
+    }
+    if ($path) {
+        $scriptblock = $scriptblock -replace "\`$path", "$path"
+    }
+
+    
     #
     #Number of seperate jobs to spawn
     $jobs = $jobs
@@ -64,6 +66,7 @@ function createEggJob {
     #divide the jobs up equally
     $items = Get-RoundedDown ($records.count / $y.count)
     if (($records.count / $y.count) -like "*.*") { $items = $items + 1 }
+
     $itemsEgg = $items
     $scriptblockEgg = $scriptblock
     $recordsEgg = $records
@@ -105,4 +108,4 @@ function createEggJob {
     clear-variable int_records -ErrorAction SilentlyContinue
     
     write-host ("All jobs are done. Time elapsed: " + $stopwatch.elapsed) -ForegroundColor Cyan
-}
+}   
