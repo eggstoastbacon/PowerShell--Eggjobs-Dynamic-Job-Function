@@ -25,13 +25,15 @@ function createEggJob {
     {New-Variable -Name ("job_" + $var + "_array") -Value @()}
 
     $jobvarnames = get-variable | where-object {$_.Name -like "*_array*" -and $_.Name -like "*Job*"}
-
+    
     while ($records.count -gt 0){
+    try{
     foreach($jobvar in $jobvarnames){
     $sVarString = ("$" + $jobvar.name + " += `$records[0]") | out-string
     Invoke-Expression $sVarString
     $records = $records | select-object -skip 1
     }
+    }catch{}
     }
 
     foreach($jobvar in $jobvarnames){
@@ -39,7 +41,6 @@ function createEggJob {
     Invoke-Expression $sVarString
     }
     }
-
     
     if ($replace) {
         #Can you figure out why I had to do this with replace? 
@@ -55,10 +56,8 @@ function createEggJob {
     }
     if ($path) {
         $scriptblock = $scriptblock -replace "\`$path", "$path"
-    }
+    }    
 
-    
-    #
     #Number of seperate jobs to spawn
     $jobs = $jobs
 
