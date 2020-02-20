@@ -1,1 +1,1 @@
-https://github.com/eggstoastbacon/PowerShell--Eggjobs-Dynamic-Job-Function/wiki
+Use: https://github.com/eggstoastbacon/Invoke-EggJob
